@@ -1,0 +1,24 @@
+
+# Start infrakit
+start : start.sh
+
+# vars - sets the variables
+vars : vars.sh
+
+# Configuration for inventory controller
+inventory : inventory.yml
+
+# The resource config for entire mystack
+phase1 : mystack.yml
+
+# The resource config for nodes after phase1
+phase2 : nodes.yml
+
+# The specific resources we can provision
+resources : resources/index.yml
+
+# Create a single instance
+ondemand : resources/provision-instance.yml
+
+# Create a spot instance
+spot : resources/provision-spot-instance.yml

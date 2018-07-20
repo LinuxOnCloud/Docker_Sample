@@ -1,0 +1,20 @@
+.DS_Store
+
+# Editor/IDE files
+*~
+.idea/
+*.iml
+coverage.txt
+.tags
+
+# Build binaries
+build/*
+
+# Demo files
+demo/*
+
+# Vim temporary files.
+.*.swp
+
+# Test binary, build with `go test -c`
+*.test

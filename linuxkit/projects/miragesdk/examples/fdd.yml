@@ -1,0 +1,37 @@
+kernel:
+  image: linuxkit/kernel:4.9.34
+  cmdline: "console=ttyS0 page_poison=1"
+init:
+  - linuxkit/init:b212cfeb4bb6330e0a7547d8010fe2e8489b677a
+  - linuxkit/runc:7c39a68490a12cde830e1922f171c451fb08e731
+  - linuxkit/containerd:37e397ebfc6bd5d8e18695b121166ffd0cbfd9f0
+  - linuxkit/ca-certificates:v0.2
+  - samoht/fdd
+onboot:
+  - name: sysctl
+    image: linuxkit/sysctl:v0.2
+services:
+  - name: getty
+    image: linuxkit/getty:v0.2
+    env:
+     - INSECURE=true
+  - name: rngd
+    image: linuxkit/rngd:v0.2
+  - name: dhcpcd
+    image: linuxkit/dhcpcd:v0.2
+files:
+  - path: etc/init.d/020-fdd-init
+    mode: "0700"
+    contents: |
+      #!/bin/sh
+      /bin/fdd init -vv -s /run/fdd.sock
+  - path: etc/init.d/030-fdd-share
+    mode: "0700"
+    contents: |
+      #!/bin/sh
+      /bin/fdd share -vv -s /run/fdd.sock /tmp/channel-net-eng &&
+      /bin/fdd share -vv -s /run/fdd.sock /tmp/channel-conf-net &&
+      /bin/fdd share -vv -s /run/fdd.sock /tmp/channel-conf-act
+trust:
+  org:
+    - linuxkit

@@ -1,0 +1,36 @@
+{{/* Input to create instance using the GCP instance plugin */}}
+{{/* =% instanceProvision "google/compute" true  %= */}}
+
+{{ $user := flag "user" "string" "owner" | prompt "Owner?" "string" (env "USER") nil }}
+{{ $image := flag "image-id" "string" "Image  ID" | prompt "Image to boot?" "string" "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161205" }}
+{{ $instanceType := flag "instance-type" "string" "Machine type" | prompt "Machine type?" "string" "n1-standard-1"}}
+{{ $privateIP := flag "private-ip" "string" "Private IP" | prompt "Private IP address (IPv4)?" "string" "10.128.0.10" nil }}
+
+{{ $diskSize := flag "disk-size" "int" "Disk size in gb" | prompt "Disk size in GB?" "int" 100 }}
+
+
+LogicalID : {{ $privateIP }}
+Tags:
+  infrakit.created: {{ now | htmlDate }}
+  infrakit.user: {{ $user }}
+
+Init: |
+  #!/bin/bash
+  sudo apt-get update -y
+  sudo apt-get install wget curl
+  wget -qO- https://get.docker.com | sh
+
+Properties:
+  NamePrefix: {{ $user }}
+  PrivateIP: {{ $privateIP }}
+  Description: Some description
+  Network: default
+  MachineType: {{ $instanceType }}
+  Disks:
+    - Image: {{ $image }}
+      SizeGb: {{ $diskSize }}
+  Scopes:
+    - https://www.googleapis.com/auth/cloudruntimeconfig
+    - https://www.googleapis.com/auth/logging.write
+  Tags:
+    - {{ $user }}

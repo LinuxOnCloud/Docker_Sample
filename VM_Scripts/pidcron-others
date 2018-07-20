@@ -1,0 +1,2 @@
+*     *       *       *       *       /vmpath/sbin/process  App42AdminController /root/App42_PaaS_Components/App42_PaaS_Admin_Controller run.sh
+*     *       *       *       *       /vmpath/sbin/process  App42ResourceManager /root/App42_PaaS_Components/App42_PaaS_ResourceManager run.sh

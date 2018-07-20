@@ -1,0 +1,20 @@
+[server default]
+  # mysql user and password
+  user=mhauser
+  password=App42RDSMHAPassword
+  ssh_user=root
+  # working directory on the manager
+  manager_workdir=/var/log/masterha/app1
+  # working directory on MySQL servers
+  remote_workdir=/var/log/masterha/app1
+
+  master_ip_failover_script=/etc/mha/master_ip_failover_recovery
+  #report_script=/etc/mha/send_report
+
+  [server1]
+  hostname=10.20.1.7
+master_binlog_dir=/var/lib/mysql-binlog/
+
+  [server2]
+  hostname=10.20.1.8
+master_binlog_dir=/var/lib/mysql-binlog/

@@ -1,0 +1,102 @@
+{{/* =% text %= */}}
+
+{{ $project := metadata `mystack/vars/project` }}
+{{ $cidr := metadata `mystack/vars/cidr` }}
+{{ $cidrSubnet1 := metadata `mystack/vars/subnet1/cidr` }}
+{{ $cidrSubnet2 := metadata `mystack/vars/subnet2/cidr` }}
+{{ $azSubnet1 := metadata `mystack/vars/subnet1/az` }}
+{{ $azSubnet2 := metadata `mystack/vars/subnet2/az` }}
+
+kind: resource
+metadata:
+  name: {{ $project }}
+options:
+  ObserveInterval: 10s
+properties:
+
+  # The VPC
+  vpc:
+    plugin: aws/ec2-vpc
+    select:
+      Name: {{ $project }}-vpc
+      infrakit_scope: {{ $project }}
+    Properties:
+      CreateVpcInput:
+        CidrBlock: {{ $cidr }}
+      ModifyVpcAttributeInputs:
+        - EnableDnsSupport:
+            Value: true
+        - EnableDnsHostnames:
+            Value: true
+
+  # Internet Gateway
+  igw:
+    plugin: aws/ec2-internetgateway
+    select:
+      Name: {{ $project }}-igw
+      infrakit_scope: {{ $project }}
+    Properties:
+      AttachInternetGatewayInput:
+        VpcId : {{ depend `vpc/Properties/VpcId` }}
+
+  # The main routetable
+  rtb:
+    plugin: aws/ec2-routetable
+    select:
+      Name: {{ $project }}-rtb
+      infrakit_scope: {{ $project }}
+    Properties:
+      CreateRouteTableInput:
+        VpcId : {{ depend `vpc/Properties/VpcId` }}
+      CreateRouteInputs:
+        - GatewayId: {{ depend `igw/Properties/InternetGatewayId` }}
+          DestinationCidrBlock: "0.0.0.0/0"
+
+  # Subnet 1 in az1
+  subnet1:
+    plugin: aws/ec2-subnet
+    select:
+      Name: {{ $project }}-subnet1
+      infrakit_scope: {{ $project }}
+    Properties:
+      CreateSubnetInput:
+        VpcId : {{ depend `vpc/Properties/VpcId` }}
+        AvailabilityZone: {{ $azSubnet1 }}
+        CidrBlock: {{ $cidrSubnet1 }}
+      RouteTableAssociation:
+        RouteTableId: {{ depend `rtb/Properties/RouteTableId` }}
+
+  # Subnet 2 in az2
+  subnet2:
+    plugin: aws/ec2-subnet
+    select:
+      Name: {{ $project }}-subnet2
+      infrakit_scope: {{ $project }}
+    Properties:
+      CreateSubnetInput:
+        VpcId : {{ depend `vpc/Properties/VpcId` }}
+        AvailabilityZone: {{ $azSubnet2 }}
+        CidrBlock: {{ $cidrSubnet2 }}
+      RouteTableAssociation:
+        RouteTableId: {{ depend `rtb/Properties/RouteTableId` }}
+
+  # Security Groups
+  sg1:
+    plugin: aws/ec2-securitygroup
+    select:
+      Name: {{ $project }}-sg1
+      infrakit_scope: {{ $project }}
+    Properties:
+      CreateSecurityGroupInput:
+        VpcId : {{ depend `vpc/Properties/VpcId` }}
+        GroupName: {{ $project }}-sg1
+        Description: basic-sg
+      AuthorizeSecurityGroupIngressInput:
+        - CidrIp : 0.0.0.0/0
+          IpProtocol: "tcp"
+          FromPort: 22
+          ToPort: 22
+        - CidrIp : 0.0.0.0/0
+          IpProtocol: "tcp"
+          FromPort: 24864
+          ToPort: 24864

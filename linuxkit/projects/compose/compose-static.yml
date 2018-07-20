@@ -1,0 +1,59 @@
+kernel:
+  image: linuxkit/kernel:4.14.29
+  cmdline: "console=ttyS0 page_poison=1"
+init:
+  - linuxkit/init:b212cfeb4bb6330e0a7547d8010fe2e8489b677a
+  - linuxkit/runc:7c39a68490a12cde830e1922f171c451fb08e731
+  - linuxkit/containerd:37e397ebfc6bd5d8e18695b121166ffd0cbfd9f0
+  - linuxkit/ca-certificates:v0.2
+onboot:
+  - name: sysctl
+    image: linuxkit/sysctl:v0.2
+  - name: sysfs
+    image: linuxkit/sysfs:v0.2
+  - name: dhcpcd
+    image: linuxkit/dhcpcd:v0.2
+    command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
+  - name: format
+    image: linuxkit/format:v0.2
+  - name: mount
+    image: linuxkit/mount:v0.2
+    command: ["/usr/bin/mountie", "/var/lib/docker"]
+services:
+  - name: rngd
+    image: linuxkit/rngd:v0.2
+  - name: ntpd
+    image: linuxkit/openntpd:v0.2
+  - name: docker
+    image: docker:17.07.0-ce-dind
+    capabilities:
+     - all
+    mounts:
+     - type: cgroup
+       options: ["rw","nosuid","noexec","nodev","relatime"]
+    binds:
+     - /etc/resolv.conf:/etc/resolv.conf
+     - /var/lib/docker:/var/lib/docker
+     - /lib/modules:/lib/modules
+     - /var/run:/var/run
+     - /etc/html:/var/html
+    command: ["/usr/local/bin/docker-init", "/usr/local/bin/dockerd"]
+  - name: compose
+    image: linuxkitprojects/compose:0535e78608f57702745dfd56fbe78d28d237e469
+    binds:
+     - /var/run:/var/run
+     - /etc/compose:/compose
+files:
+  - path: etc/html/a/index.html
+    source: html-a.html
+  - path: etc/html/b/index.html
+    source: html-b.html
+  - path: etc/compose/docker-compose.yml
+    source: docker-compose.yml
+  - path: etc/compose/images/nginx:alpine.tar
+    source: image-cache/nginx:alpine.tar
+  - path: etc/compose/images/traefik.tar
+    source: image-cache/traefik.tar
+trust:
+  org:
+    - linuxkit

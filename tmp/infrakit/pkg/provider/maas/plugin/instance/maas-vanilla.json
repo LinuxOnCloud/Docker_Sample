@@ -1,0 +1,26 @@
+{
+  "ID": "cattle",
+  "Properties": {
+    "Allocation": {
+      "Size": 2
+    },
+    "Instance": {
+      "Plugin": "instance-maas",
+      "Properties": {
+      }
+    },
+    "Flavor": {
+      "Plugin": "flavor-vanilla",
+      "Properties": {
+        "Init": [
+            "#!/bin/bash",
+            "echo ======== Hi World ======================| tee /my.log"
+        ],
+        "Tags": {
+            "tier": "web",
+            "project": "infrakit"
+        }
+      }
+    }
+  }
+}

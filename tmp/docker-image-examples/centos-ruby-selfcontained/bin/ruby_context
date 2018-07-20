@@ -1,0 +1,20 @@
+#!/bin/sh
+
+source /opt/ruby/etc/sdk
+
+export GEM_HOME=${HOME}/gems
+export GEMRC=${HOME}/etc/gemrc
+export EXECJS_RUNTIME=Node
+
+function scl_env() {
+  /usr/bin/scl enable ruby193 nodejs010 "printenv $1"
+}
+
+# FIXME: This is required in order to 'exec' run ruby instead of
+#        'scl' command. This have to be fixed in SCL in (near) future.
+#
+vars=( PATH LD_LIBRARY_PATH PYTHONPATH PKG_CONFIG_PATH )
+for var in "${vars[@]}"; do export ${var}=$(scl_env "${var}"); done
+
+cmd="$1" && shift
+exec "$cmd" "$@"

@@ -1,0 +1,7 @@
+
+# Start infrakit
+start : start.sh
+
+chain.yml : chain.yml
+chain2.yml : chain2.yml
+chain3.yml : chain3.yml

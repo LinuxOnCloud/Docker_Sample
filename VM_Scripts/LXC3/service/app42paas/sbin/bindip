@@ -1,0 +1,1 @@
+ssh -i /root/.ssh/id_rsa root@10.138.0.8 "/vmpath/sbin/bindip $1 $2 $3 $4"

@@ -1,0 +1,2 @@
+*     *       *       *       *       /bin/sh /root/process.sh  App42ContainerManager /root/App42_PaaS_CM run.sh
+*     *       *       *       *       /bin/sh /root/process.sh  App42ContainerHealthMonitor /root/App42_PaaS_CHM run.sh

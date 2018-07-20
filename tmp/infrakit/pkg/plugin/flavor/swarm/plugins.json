@@ -1,0 +1,54 @@
+[
+    {
+      "Key": "manager",
+      "Launch": {
+        "inproc": {
+          "Kind": "manager",
+          "Options": {
+            "Name": "",
+            "Group": "group-stateless"
+          },
+	  "Settings": {
+		  "LeaderFile": "{{env "INFRAKIT_HOME"}}/leader",
+		  "StoreDir": "{{env "INFRAKIT_HOME"}}/configs"
+	  },
+          "Backend": "file"
+        }
+      }
+    }
+    ,
+    {
+      "Key": "group-stateless",
+      "Launch": {
+        "inproc": {
+          "Kind": "group",
+          "Options": {
+            "PollInterval": "10s",
+            "MaxParallelNum": 0,
+            "PollIntervalGroupSpec": "10s",
+            "PollIntervalGroupDetail": "10s"
+          }
+        }
+      }
+    }
+    ,
+    {
+      "Key": "instance-vagrant",
+      "Launch": {
+        "inproc": {
+          "Kind": "vagrant",
+          "Options": {
+          }
+        }
+      }
+    }
+    ,
+    {
+      "Key": "flavor-swarm",
+      "Launch": {
+        "inproc": {
+          "Kind": "swarm"
+        }
+      }
+    }
+]

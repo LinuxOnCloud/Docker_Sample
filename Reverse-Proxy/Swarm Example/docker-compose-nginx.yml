@@ -1,0 +1,35 @@
+version: '3'
+services:
+  reverseproxy:
+    image: viveksoni56/reverseproxy
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 1
+      #endpoint_mode: vip
+      labels:
+        com.example.description: "This label will appear on the web service reverseproxy"
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  webserver:
+    depends_on:
+        - reverseproxy
+    image: viveksoni56/pyapp
+    #ports:
+    #  - "8080:80"
+    #networks:
+     # - vivek_overlay
+    deploy:
+      replicas: 2
+      #endpoint_mode: vip
+      labels:
+        com.example.description: "This label will appear on the web service"
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure

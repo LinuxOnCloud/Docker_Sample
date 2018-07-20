@@ -1,0 +1,52 @@
+{{/* Input to create instance using the AWS instance plugin */}}
+{{/* =% instanceProvision "instance-aws/ec2-instance" true  %= */}}
+
+{{ $user := flag "user" "string" "username" | prompt "Please enter your user name:" "string" (env "USER")}}
+{{ $imageId := flag "image-id" "string" "Image ID" | prompt "AMI?" "string"}}
+{{ $instanceType := flag "instance-type" "string" "instance type" | prompt "Instance type?" "string"}}
+{{ $privateIP := flag "private-ip" "string" "Private IP" | prompt "Private IP address (IPv4)?" "string" "" nil }}
+
+
+{{ $keyName := flag "key" "string" "ssh key name" | prompt "SSH key?" "string"}}
+{{ $az := flag "az" "string" "availability zone" | prompt "Availability zone?" "string"}}
+{{ $subnetId := flag "subnet" "string" "subnet id" | prompt "Subnet ID?" "string"}}
+{{ $securityGroupId := flag "security-group-id" "string" "security group id" | prompt "Security group ID?" "string" }}
+
+Tags:
+  infrakit.created: {{ now | htmlDate }}
+  infrakit.user: {{ $user }}
+
+Init: |
+  #!/bin/bash
+  sudo apt-get update -y
+  sudo apt-get install wget curl
+  wget -qO- https://get.docker.com | sh
+
+Properties:
+  RunInstancesInput:
+    BlockDeviceMappings: null
+    DisableApiTermination: null
+    EbsOptimized: null
+    IamInstanceProfile: null
+    ImageId: {{ $imageId }}
+    InstanceInitiatedShutdownBehavior: null
+    InstanceType: {{ $instanceType }}
+    KeyName: {{ $keyName }}
+    NetworkInterfaces:
+    - AssociatePublicIpAddress: true
+      PrivateIpAddress: {{ $privateIP }}
+      DeleteOnTermination: true
+      DeviceIndex: 0
+      Groups:
+      - {{ $securityGroupId }}
+      NetworkInterfaceId: null
+      SubnetId: {{ $subnetId }}
+    Placement:
+      Affinity: null
+      AvailabilityZone: {{ $az }}
+      Tenancy: null
+    RamdiskId: null
+    SubnetId: null
+    UserData: null
+  Tags:
+    infrakit.user: {{ $user }}

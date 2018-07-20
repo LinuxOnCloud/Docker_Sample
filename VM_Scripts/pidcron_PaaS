@@ -1,0 +1,3 @@
+*     *       *       *       *       /bin/sh /root/process.sh  tomcat7 /opt/tomcat7/bin/ startup.sh 
+*     *       *       *       *       /bin/sh /root/process.sh  tomcatHQ /opt/tomcatHQ/bin/ startup.sh
+
